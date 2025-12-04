@@ -1,0 +1,22 @@
+
+    CodeAudit Report — Submission 6
+    =====================================
+
+    Score: 46
+
+    Summary:
+    [QUALITY]
+Lines: 40, Comments: 0, Long lines: 0, Complexity: 19.
+
+[SECURITY]
+Security issues: 0
+
+[PERFORMANCE]
+Loop count: 6, Nested risk: True
+
+    Issues:
+    Low comment density.
+High cyclomatic complexity.
+Too many single-letter variable names.
+Nested loop patterns detected.
+    

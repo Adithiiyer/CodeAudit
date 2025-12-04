@@ -1,0 +1,19 @@
+
+    CodeAudit Report — Submission 4
+    =====================================
+
+    Score: 87
+
+    Summary:
+    [QUALITY]
+Lines: 8, Comments: 0, Long lines: 0, Complexity: 3.
+
+[SECURITY]
+Security issues: 0
+
+[PERFORMANCE]
+Loop count: 1, Nested risk: False
+
+    Issues:
+    Low comment density.
+    
