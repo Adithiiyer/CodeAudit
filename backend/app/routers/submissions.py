@@ -1,0 +1,80 @@
+from fastapi import APIRouter, UploadFile, File, BackgroundTasks, Depends
+from sqlalchemy.orm import Session
+from ..database import get_db, SessionLocal
+from ..models import Submission, ReviewResult
+from ..schemas import SubmissionOut
+from ..services.storage import save_upload
+from ..services.analyzer import analyze_file
+import tempfile, zipfile, os
+
+router = APIRouter(prefix="/submissions", tags=["Submissions"])
+
+def detect_lang(name):
+    ext = name.split(".")[-1]
+    mapping = {
+        "py": "python",
+        "js": "javascript",
+        "ts": "javascript",
+        "java": "java",
+        "cpp": "cpp",
+        "c": "c",
+        "go": "go"
+    }
+    return mapping.get(ext, "unknown")
+
+
+@router.post("/", response_model=SubmissionOut)
+async def upload_single(background: BackgroundTasks,
+                        file: UploadFile = File(...),
+                        db: Session = Depends(get_db)):
+
+    path = save_upload(file, file.filename)
+    lang = detect_lang(file.filename)
+
+    submission = Submission(
+        filename=file.filename,
+        storage_path=path,
+        language=lang,
+        status="processing"
+    )
+
+    db.add(submission)
+    db.commit()
+    db.refresh(submission)
+
+    background.add_task(process_submission, submission.id, path, lang)
+
+    return submission
+
+
+def process_submission(id: int, path: str, lang: str):
+    db = SessionLocal()
+
+    # Fixed: Use db.get() instead of db.query().get()
+    submission = db.get(Submission, id)
+
+    score, summary, issues = analyze_file(id, path, lang)
+
+    result = ReviewResult(
+        submission_id=id,
+        score=score,
+        summary=summary,
+        issues=issues
+    )
+
+    db.add(result)
+    submission.status = "completed"
+
+    db.commit()
+    db.close()
+
+
+@router.get("/", response_model=list[SubmissionOut])
+def list_submissions(db: Session = Depends(get_db)):
+    return db.query(Submission).all()
+
+
+@router.get("/{id}", response_model=SubmissionOut)
+def get_submission(id: int, db: Session = Depends(get_db)):
+    # Fixed: Use db.get() instead of db.query().get()
+    return db.get(Submission, id)

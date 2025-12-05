@@ -1,0 +1,22 @@
+
+    CodeAudit Report — Submission 1
+    =====================================
+
+    Score: 49
+
+    Summary:
+    [QUALITY]
+Lines: 13, Comments: 0, Long lines: 1, Complexity: 34.
+
+[SECURITY]
+Security issues: 0
+
+[PERFORMANCE]
+Loop count: 4, Nested risk: False
+
+    Issues:
+    [QUALITY] Low comment density.
+[QUALITY] 1 overly long lines (>120 chars).
+[QUALITY] High cyclomatic complexity.
+[QUALITY] Too many single-letter variable names.
+    

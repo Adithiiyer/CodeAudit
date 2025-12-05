@@ -1,0 +1,20 @@
+
+    CodeAudit Report — Submission 5
+    =====================================
+
+    Score: 83
+
+    Summary:
+    [QUALITY]
+Lines: 6, Comments: 0, Long lines: 0, Complexity: 1.
+
+[SECURITY]
+Security issues: 0
+
+[PERFORMANCE]
+Loop count: 1, Nested risk: False
+
+    Issues:
+    Low comment density.
+Too many single-letter variable names.
+    
