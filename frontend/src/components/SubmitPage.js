@@ -1,3 +1,5 @@
+// src/components/SubmitPage.js
+
 import { useState } from "react";
 import { api } from "../api";
 import {
@@ -17,24 +19,31 @@ export default function SubmitPage() {
   const [file, setFile] = useState(null);
   const [code, setCode] = useState("");
 
-  // upload one file
+  // ---- Upload File ----
   const uploadFile = async () => {
     const form = new FormData();
     form.append("file", file);
-    await api.post("/submissions/", form);
-    alert("File submitted!");
-    setFile(null); // Clear file after submission
+
+    const res = await api.post("/submissions/", form);
+    const id = res.data.id;
+
+    // Redirect to review page
+    window.location.href = `/review/${id}`;
   };
 
-  // paste code
+  // ---- Paste Code ----
   const uploadCode = async () => {
     const blob = new Blob([code], { type: "text/plain" });
     const fileObj = new File([blob], "pasted_code.py");
+
     const form = new FormData();
     form.append("file", fileObj);
-    await api.post("/submissions/", form);
-    alert("Code submitted!");
-    setCode(""); // Clear code after submission
+
+    const res = await api.post("/submissions/", form);
+    const id = res.data.id;
+
+    // Redirect to review page
+    window.location.href = `/review/${id}`;
   };
 
   return (
@@ -52,11 +61,7 @@ export default function SubmitPage() {
         {tab === 0 && (
           <Stack spacing={2}>
             <FileDropZone onSelect={setFile} selectedFile={file} />
-            <Button
-              variant="contained"
-              disabled={!file}
-              onClick={uploadFile}
-            >
+            <Button variant="contained" disabled={!file} onClick={uploadFile}>
               Submit File
             </Button>
           </Stack>

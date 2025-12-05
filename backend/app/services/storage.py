@@ -1,17 +1,15 @@
+import shutil
 from pathlib import Path
-from ..config import STORAGE_DIR
+from app.config import UPLOAD_DIR, REPORT_DIR
 
 def save_upload(file, filename):
-    folder = Path(STORAGE_DIR) / "uploads"
-    folder.mkdir(exist_ok=True)
-    path = folder / filename
-    with open(path, "wb") as f:
-        f.write(file.file.read())
+    path = UPLOAD_DIR / filename
+    with open(path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
     return str(path)
 
 def write_report(submission_id: int, content: str):
-    folder = Path(STORAGE_DIR) / "reports"
-    folder.mkdir(exist_ok=True)
-    path = folder / f"submission_{submission_id}.txt"
-    path.write_text(content)
-    return str(path)
+    report_path = REPORT_DIR / f"{submission_id}.txt"
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(content)
+    return str(report_path)

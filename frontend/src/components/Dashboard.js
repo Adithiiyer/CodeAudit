@@ -1,30 +1,30 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
 import { Box, Typography, Grid, Paper } from "@mui/material";
+import { Link } from "react-router-dom";
 import StatsCard from "./StatsCard";
+import { getAllSubmissions } from "../api";
 
 export default function Dashboard() {
   const [subs, setSubs] = useState([]);
 
   useEffect(() => {
-    api.get("/submissions/").then((res) => setSubs(res.data));
+    getAllSubmissions().then(setSubs);
   }, []);
 
   const avgScore =
     subs.length > 0
       ? (
-          subs.reduce((a, b) => a + (b.review_result?.score || 0), 0) / subs.length
+          subs.reduce((sum, s) => sum + (s.review_result?.score || 0), 0) /
+          subs.length
         ).toFixed(1)
       : 0;
 
-  // Calculate total issues by parsing the issues string
-  const totalIssues = subs.reduce((total, sub) => {
-    if (sub.review_result?.issues) {
-      // Split by newline and filter out empty strings
-      const issueList = sub.review_result.issues
-        .split('\n')
-        .filter(issue => issue.trim() !== '');
-      return total + issueList.length;
+  const totalIssues = subs.reduce((total, s) => {
+    if (s.review_result?.issues) {
+      const count = s.review_result.issues
+        .split("\n")
+        .filter((i) => i.trim() !== "").length;
+      return total + count;
     }
     return total;
   }, 0);
@@ -51,12 +51,19 @@ export default function Dashboard() {
         <Typography variant="h6">Recent Submissions</Typography>
 
         {subs.length === 0 && (
-          <Typography>No submissions yet. Submit your first file!</Typography>
+          <Typography>No submissions yet.</Typography>
         )}
 
         {subs.map((s) => (
           <Box key={s.id} sx={{ mt: 1 }}>
-            <b>{s.filename}</b> — {s.status} (Score: {s.review_result?.score || 'Pending'})
+            <Link
+              to={`/review/${s.id}`}
+              style={{ color: "#60a5fa", textDecoration: "none" }}
+            >
+              <b>{s.filename}</b>
+            </Link>
+            {" — "}
+            {s.status} (Score: {s.review_result?.score ?? "Pending"})
           </Box>
         ))}
       </Paper>
