@@ -17,6 +17,18 @@ export default function Dashboard() {
         ).toFixed(1)
       : 0;
 
+  // Calculate total issues by parsing the issues string
+  const totalIssues = subs.reduce((total, sub) => {
+    if (sub.review_result?.issues) {
+      // Split by newline and filter out empty strings
+      const issueList = sub.review_result.issues
+        .split('\n')
+        .filter(issue => issue.trim() !== '');
+      return total + issueList.length;
+    }
+    return total;
+  }, 0);
+
   return (
     <Box p={4}>
       <Typography variant="h4" sx={{ mb: 3 }}>
@@ -31,7 +43,7 @@ export default function Dashboard() {
           <StatsCard title="Average Score" value={avgScore} />
         </Grid>
         <Grid item>
-          <StatsCard title="Total Issues Found" value={"—"} />
+          <StatsCard title="Total Issues Found" value={totalIssues} />
         </Grid>
       </Grid>
 
@@ -44,7 +56,7 @@ export default function Dashboard() {
 
         {subs.map((s) => (
           <Box key={s.id} sx={{ mt: 1 }}>
-            <b>{s.filename}</b> — {s.status} (Score: {s.review_result?.score})
+            <b>{s.filename}</b> — {s.status} (Score: {s.review_result?.score || 'Pending'})
           </Box>
         ))}
       </Paper>

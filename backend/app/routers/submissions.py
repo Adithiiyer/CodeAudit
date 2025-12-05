@@ -50,7 +50,8 @@ async def upload_single(background: BackgroundTasks,
 def process_submission(id: int, path: str, lang: str):
     db = SessionLocal()
 
-    submission = db.query(Submission).get(id)
+    # Fixed: Use db.get() instead of db.query().get()
+    submission = db.get(Submission, id)
 
     score, summary, issues = analyze_file(id, path, lang)
 
@@ -75,4 +76,5 @@ def list_submissions(db: Session = Depends(get_db)):
 
 @router.get("/{id}", response_model=SubmissionOut)
 def get_submission(id: int, db: Session = Depends(get_db)):
-    return db.query(Submission).get(id)
+    # Fixed: Use db.get() instead of db.query().get()
+    return db.get(Submission, id)

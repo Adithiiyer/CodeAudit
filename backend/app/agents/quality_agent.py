@@ -1,4 +1,5 @@
 import re
+import ast
 from .base_agent import BaseAgent
 
 class CodeQualityAgent(BaseAgent):
@@ -24,13 +25,43 @@ class CodeQualityAgent(BaseAgent):
         if comment_ratio < 0.10:
             score -= 10
 
-        score = max(0, min(100, score))
-
         issues = []
-        if comment_ratio < 0.10: issues.append("Low comment density.")
-        if long_lines > 0: issues.append(f"{long_lines} overly long lines (>120 chars).")
-        if complexity > 15: issues.append("High cyclomatic complexity.")
-        if bad_names > 5: issues.append("Too many single-letter variable names.")
+        
+        # Syntax checking for Python
+        if language == "python":
+            try:
+                ast.parse(code)
+            except SyntaxError as e:
+                score -= 30  # Heavy penalty for syntax errors
+                issues.append(f"Syntax Error at line {e.lineno}: {e.msg}")
+            except Exception as e:
+                score -= 20
+                issues.append(f"Code parsing error: {str(e)}")
+        
+        # Syntax checking for JavaScript/TypeScript (basic)
+        if language == "javascript":
+            # Check for common syntax issues
+            if code.count('{') != code.count('}'):
+                score -= 25
+                issues.append("Mismatched curly braces detected")
+            if code.count('(') != code.count(')'):
+                score -= 25
+                issues.append("Mismatched parentheses detected")
+            if code.count('[') != code.count(']'):
+                score -= 25
+                issues.append("Mismatched square brackets detected")
+
+        # Quality checks
+        if comment_ratio < 0.10:
+            issues.append("Low comment density.")
+        if long_lines > 0:
+            issues.append(f"{long_lines} overly long lines (>120 chars).")
+        if complexity > 15:
+            issues.append("High cyclomatic complexity.")
+        if bad_names > 5:
+            issues.append("Too many single-letter variable names.")
+
+        score = max(0, min(100, score))
 
         summary = (
             f"Lines: {total_lines}, Comments: {comment_lines}, "

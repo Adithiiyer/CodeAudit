@@ -11,12 +11,18 @@ def run_all_agents(code: str, language: str):
 
     final_score = 0
     summaries = []
-    issues = []
+    all_issues = []
 
     for name, agent, weight in agents:
         result = agent.analyze(code, language)
         final_score += result["score"] * weight
         summaries.append(f"[{name.upper()}]\n{result['summary']}")
-        issues.extend(result["issues"])
+        
+        # Format issues with category prefix
+        for issue in result["issues"]:
+            all_issues.append(f"[{name.upper()}] {issue}")
 
-    return int(final_score), "\n\n".join(summaries), "\n".join(issues)
+    # Join issues with newlines for storage
+    issues_text = "\n".join(all_issues) if all_issues else "No issues found"
+    
+    return int(final_score), "\n\n".join(summaries), issues_text

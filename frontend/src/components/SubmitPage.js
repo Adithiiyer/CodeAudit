@@ -23,6 +23,7 @@ export default function SubmitPage() {
     form.append("file", file);
     await api.post("/submissions/", form);
     alert("File submitted!");
+    setFile(null); // Clear file after submission
   };
 
   // paste code
@@ -33,6 +34,7 @@ export default function SubmitPage() {
     form.append("file", fileObj);
     await api.post("/submissions/", form);
     alert("Code submitted!");
+    setCode(""); // Clear code after submission
   };
 
   return (
@@ -49,7 +51,7 @@ export default function SubmitPage() {
       <Paper sx={{ p: 3, mt: 3 }}>
         {tab === 0 && (
           <Stack spacing={2}>
-            <FileDropZone onSelect={setFile} />
+            <FileDropZone onSelect={setFile} selectedFile={file} />
             <Button
               variant="contained"
               disabled={!file}
