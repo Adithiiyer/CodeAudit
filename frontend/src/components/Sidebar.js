@@ -1,7 +1,15 @@
 import React from "react";
-import { Drawer, List, ListItemButton, ListItemText, Toolbar, Typography } from "@mui/material";
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { Link } from "react-router-dom";
 
-export default function Sidebar({ onSelect }) {
+export default function Sidebar() {
   return (
     <Drawer
       variant="permanent"
@@ -10,19 +18,19 @@ export default function Sidebar({ onSelect }) {
         "& .MuiDrawer-paper": {
           width: 220,
           background: "#111827",
-          color: "white"
-        }
+          color: "white",
+        },
       }}
     >
       <Toolbar />
       <Typography sx={{ px: 2, fontSize: 14, opacity: 0.8 }}>Navigation</Typography>
 
       <List>
-        <ListItemButton onClick={() => onSelect("dashboard")}>
+        <ListItemButton component={Link} to="/">
           <ListItemText primary="Dashboard" />
         </ListItemButton>
 
-        <ListItemButton onClick={() => onSelect("submit")}>
+        <ListItemButton component={Link} to="/submit">
           <ListItemText primary="Submit Code" />
         </ListItemButton>
       </List>

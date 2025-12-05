@@ -1,17 +1,17 @@
 from fastapi import APIRouter, UploadFile, File, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
-from ..database import get_db, SessionLocal
-from ..models import Submission, ReviewResult
-from ..schemas import SubmissionOut
-from ..services.storage import save_upload
-from ..services.analyzer import analyze_file
-import tempfile, zipfile, os
+from app.database import get_db, SessionLocal
+from app.models import Submission, ReviewResult
+from app.schemas import SubmissionOut
+from app.services.storage import save_upload
+from app.services.analyzer import analyze_file
 
 router = APIRouter(prefix="/submissions", tags=["Submissions"])
 
-def detect_lang(name):
-    ext = name.split(".")[-1]
-    mapping = {
+
+def detect_lang(filename):
+    ext = filename.split(".")[-1]
+    return {
         "py": "python",
         "js": "javascript",
         "ts": "javascript",
@@ -19,8 +19,7 @@ def detect_lang(name):
         "cpp": "cpp",
         "c": "c",
         "go": "go"
-    }
-    return mapping.get(ext, "unknown")
+    }.get(ext, "unknown")
 
 
 @router.post("/", response_model=SubmissionOut)
@@ -50,16 +49,16 @@ async def upload_single(background: BackgroundTasks,
 def process_submission(id: int, path: str, lang: str):
     db = SessionLocal()
 
-    # Fixed: Use db.get() instead of db.query().get()
     submission = db.get(Submission, id)
 
-    score, summary, issues = analyze_file(id, path, lang)
+    score, summary, issues, llm_json = analyze_file(id, path, lang)
 
     result = ReviewResult(
         submission_id=id,
         score=score,
         summary=summary,
-        issues=issues
+        issues=issues,
+        llm_analysis=str(llm_json)
     )
 
     db.add(result)
@@ -76,5 +75,4 @@ def list_submissions(db: Session = Depends(get_db)):
 
 @router.get("/{id}", response_model=SubmissionOut)
 def get_submission(id: int, db: Session = Depends(get_db)):
-    # Fixed: Use db.get() instead of db.query().get()
     return db.get(Submission, id)

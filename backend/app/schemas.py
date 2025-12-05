@@ -8,10 +8,12 @@ class ReviewResultOut(BaseModel):
     score: int
     summary: str
     issues: str
+    llm_analysis: Optional[str]
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 class SubmissionOut(BaseModel):
     id: int
@@ -22,4 +24,4 @@ class SubmissionOut(BaseModel):
     review_result: Optional[ReviewResultOut]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
