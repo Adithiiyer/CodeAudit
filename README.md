@@ -68,3 +68,5 @@ Groq LLM (Semantic Review)
 SQLite Database
       ↓
 Frontend Dashboard (Displays Results)
+
+Deployment link: https://codeaudit-frontend-5091832740.us-central1.run.app/
